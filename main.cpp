@@ -1,15 +1,15 @@
 #include <pcap.h>
 #include <stdio.h>
 #include <cstring>
-
+#include <string>
 #include <net/ethernet.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 
 
 void usage() {
-    printf("syntax: pcap-test <interface>\n");
-    printf("sample: pcap-test wlan0\n");
+    printf("syntax: pcap-test <interface> <count>\n");
+    printf("sample: pcap-test wlan0 20(Maximum count : 20)\n");
 }
 
 char* ntoh_hex(u_int8_t *addr, char* buf, int size)
@@ -17,9 +17,9 @@ char* ntoh_hex(u_int8_t *addr, char* buf, int size)
 
     for(int i=0;i<size;i++)
     {
-            snprintf(buf+(3*i),size, "%02x",addr[i]);
-            if(i!=size-1)
-                snprintf(buf+2+(3*i),2,":");
+        snprintf(buf+(3*i),size, "%02x",addr[i]);
+        if(i!=size-1)
+            snprintf(buf+2+(3*i),2,":");
 
     }
 
@@ -99,12 +99,14 @@ void callback(u_char *user ,const struct pcap_pkthdr* header, const u_char* pkt_
 
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
+    if (argc != 3) {
         usage();
         return -1;
     }
-
-
+    if(atoi(argv[2])>20){
+        printf("Please choose the number not over 20.");
+        return -1;
+}
 
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_if_t* alldevsp;
@@ -153,19 +155,15 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    pcap_loop(handle, 0, callback, nullptr );
 
-//    while (true) {
-//        struct pcap_pkthdr* header;
-//        const u_char* packet;
-//        int res = pcap_next_ex(handle, &header, &packet);
-//        if (res == 0) continue;
-//        if (res == -1 || res == -2) {
-//            printf("pcap_next_ex return %d(%s)\n", res, pcap_geterr(handle));
-//            break;
-//        }
-//        printf("%u bytes captured\n", header->caplen);
-//    }
-
+    int ret = pcap_loop(handle, atoi(argv[2]), callback, nullptr );
+    if (ret == -1 || ret == -2) {
+        printf("pcap_next_ex return %d(%s)\n", ret, pcap_geterr(handle));
+        pcap_close(handle);
+        return -1;
+    }
     pcap_close(handle);
+
+    return 0;
+
 }
