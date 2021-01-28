@@ -12,7 +12,7 @@ void usage() {
     printf("sample: pcap-test wlan0 20(Maximum count : 20)\n");
 }
 
-char* ntoh_hex(u_int8_t *addr, char* buf, int size)
+char* hex(u_int8_t *addr, char* buf, int size)
 {
 
     for(int i=0;i<size;i++)
