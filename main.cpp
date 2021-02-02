@@ -44,9 +44,9 @@ void callback(u_char *user ,const struct pcap_pkthdr* header, const u_char* pkt_
 
 
     len = snprintf(result, 36, "source MAC: %s",
-           ntoh_hex(eth_hdr->ether_shost,buf,6));
+           hex(eth_hdr->ether_shost,buf,6));
     len += snprintf(result+len, 50,  " | dest MAC: %s | ether type: %x ",
-           ntoh_hex(eth_hdr->ether_dhost,buf,6), ntohs(eth_hdr->ether_type));
+           hex(eth_hdr->ether_dhost,buf,6), ntohs(eth_hdr->ether_type));
 
 
     if(ntohs(eth_hdr->ether_type) == ETHERTYPE_IP){
